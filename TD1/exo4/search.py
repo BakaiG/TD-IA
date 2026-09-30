@@ -7,7 +7,6 @@ from collections import deque
 
 from pokemon_game import GameMap, State, successors
 
-
 def generate_random_path(
     game_map: GameMap,
     start: State,
@@ -119,7 +118,38 @@ def breadth_first_search(
     goal: State,
 ) -> list[State]:
     """Return a shortest path using Breadth-First Search."""
-    ...
+    if start == goal:
+        return [start]
+
+    for _ in range(100000):
+        path = [start]
+        visited = {start}
+        current = start
+        d = deque()
+
+        while goal not in path :
+            neighboring_states = successors(game_map, current)
+
+            if not neighboring_states:
+                break
+
+            unvisited_neighbors = [state for state in neighboring_states if state not in visited]
+
+            next_state = unvisited_neighbors[0] #déjà trié up right down left
+
+            path.append(next_state)
+            visited.add(next_state)
+            current = next_state
+
+            if current == goal:
+                return path
+            #reprendre le pseudo code
+
+    raise RuntimeError(
+        "The random walk did not reach the goal. "
+        "Try increasing max_steps or max_attempts, or use another seed."
+    )
+
 
 
 def depth_first_search(
