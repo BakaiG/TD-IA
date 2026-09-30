@@ -122,36 +122,21 @@ def breadth_first_search(
     print("BFS")
     if start == goal:
         return [start]
-    path = [start]
-    q = deque([start])
-    visited = {start}
-    #q.append , q.popleft()
-    print(f"init : start = {start} et q = {q}")
+    queue = [(start,[start])]
+    visited = set()
 
-    while q : #is not empty
-        print("in q")
-        print(f"q vaut {q}")
-        current = q.popleft()
-        print(f"current = {current}")
-        neighboring_states = successors(game_map, current)
-        print(f"neighbors : {neighboring_states}")
+    while queue:
+        vertex, path = queue.pop(0)
+        visited.add(vertex)
+        current = vertex
+        for node in successors(game_map, current):
+            if node == goal:
+                return path + [goal]
+            else:
+                if node not in visited:
+                    visited.add(node)
+                    queue.append((node, path + [node]))
 
-        if not neighboring_states:
-            break
-
-        unvisited_neighbors = [state for state in neighboring_states if state not in visited]
-        print(f"unvisited_neighbors : {unvisited_neighbors}")
-        if unvisited_neighbors :
-            for n in unvisited_neighbors:
-                q.append(n) #déjà trié up right down left
-
-        visited.add(current)
-        path.append(current)
-
-        print(f"path : {path}")
-        if current == goal:
-            return path
-        #reprendre le pseudo code
 
     raise RuntimeError(
         "The random walk did not reach the goal. "
@@ -166,4 +151,13 @@ def depth_first_search(
     goal: State,
 ) -> list[State]:
     """Return a path using Depth-First Search."""
-    ...
+    stack = [(start, [start])]
+    visited = set()
+    while stack:
+        (vertex, path) = stack.pop()
+        if vertex not in visited:
+            if vertex == goal:
+                return path
+            visited.add(vertex)
+            for neighbor in successors(game_map, vertex):
+                stack.append((neighbor, path + [neighbor]))
