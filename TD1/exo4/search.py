@@ -118,32 +118,40 @@ def breadth_first_search(
     goal: State,
 ) -> list[State]:
     """Return a shortest path using Breadth-First Search."""
+    print("-----------------------------------------")
+    print("BFS")
     if start == goal:
         return [start]
+    path = [start]
+    q = deque([start])
+    visited = {start}
+    #q.append , q.popleft()
+    print(f"init : start = {start} et q = {q}")
 
-    for _ in range(100000):
-        path = [start]
-        visited = {start}
-        current = start
-        d = deque()
+    while q : #is not empty
+        print("in q")
+        print(f"q vaut {q}")
+        current = q.popleft()
+        print(f"current = {current}")
+        neighboring_states = successors(game_map, current)
+        print(f"neighbors : {neighboring_states}")
 
-        while goal not in path :
-            neighboring_states = successors(game_map, current)
+        if not neighboring_states:
+            break
 
-            if not neighboring_states:
-                break
+        unvisited_neighbors = [state for state in neighboring_states if state not in visited]
+        print(f"unvisited_neighbors : {unvisited_neighbors}")
+        if unvisited_neighbors :
+            for n in unvisited_neighbors:
+                q.append(n) #déjà trié up right down left
 
-            unvisited_neighbors = [state for state in neighboring_states if state not in visited]
+        visited.add(current)
+        path.append(current)
 
-            next_state = unvisited_neighbors[0] #déjà trié up right down left
-
-            path.append(next_state)
-            visited.add(next_state)
-            current = next_state
-
-            if current == goal:
-                return path
-            #reprendre le pseudo code
+        print(f"path : {path}")
+        if current == goal:
+            return path
+        #reprendre le pseudo code
 
     raise RuntimeError(
         "The random walk did not reach the goal. "
