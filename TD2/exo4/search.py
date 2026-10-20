@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import heapq
 import random
+from collections import deque
 from itertools import count
+from math import inf
 
 from pokemon_game import (
     GameMap,
@@ -121,6 +123,7 @@ def dijkstra(
     goal: State,
 ) -> tuple[list[State], int]:
     """Return a minimum-cost path using Dijkstra's algorithm.
+    From Wikipedia's pseudocode (with heap queues as it was already imported)
 
     Returns
     -------
@@ -129,7 +132,36 @@ def dijkstra(
     considered_states : int
         Number of states removed from the priority queue.
     """
-    ...
+    considered_states=0
+    Q = []
+    dist = {start:0}
+    prev = {}
+    heapq.heappush(Q,(0,start))
+
+    n = len(game_map)
+    m = len(game_map[0])
+    available_states:list(State) = [(i,j) for i in range(n) for j in range(m)]
+    for s in available_states:
+      if s != start:
+        prev[s]=None
+        dist[s]=inf
+    while Q:
+      u = heapq.heappop(Q)[1]
+      for v in successors(game_map,u):
+        considered_states+=1
+        alt:int = dist[u] + movement_cost(game_map,v)
+        if alt < dist[v]:
+          prev[v] = u
+          dist[v] = alt
+          heapq.heappush(Q,(alt,v))
+    path = deque()
+    if goal==start:return ([start],considered_states) #untested
+    if prev[goal]:
+      while goal!=start:
+        path.appendleft(goal)
+        goal = prev[goal]
+    path.appendleft(start)
+    return (list(path),considered_states)
 
 
 def a_star(
