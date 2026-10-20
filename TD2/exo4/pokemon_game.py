@@ -636,12 +636,12 @@ def visualize_path(
     Store the returned animation in a variable until ``plt.show()`` finishes.
     Otherwise, Python may garbage-collect it before it is displayed.
     """
-    # validate_path(
-    #     game_map,
-    #     path,
-    #     start=start,
-    #     goal=goal,
-    # )
+    validate_path(
+        game_map,
+        path,
+        start=start,
+        goal=goal,
+    )
 
     sprites = load_sprites()
     figure, axes = _prepare_axes(game_map)

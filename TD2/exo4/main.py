@@ -42,7 +42,6 @@ def main() -> None:
     # ---------------------------------------------------------------
     # Random valid path demonstration
     # ---------------------------------------------------------------
-
     random_path = generate_random_path(
         game_map,
         start,
@@ -60,7 +59,7 @@ def main() -> None:
     print(f"Path length: {len(random_path) - 1}")
     print(f"Path cost:   {random_path_cost}")
     print(f"Path:        {random_path}")
-
+    """
     random_animation = visualize_path(
         game_map,
         start,
@@ -71,7 +70,7 @@ def main() -> None:
     )
 
     _ = random_animation
-
+    """
     # ---------------------------------------------------------------
     # Dijkstra
     # ---------------------------------------------------------------

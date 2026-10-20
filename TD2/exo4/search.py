@@ -182,29 +182,35 @@ def a_star(
         Number of states removed from the priority queue.
     """
     s_open = {start} #States
-    closed = {} #(point,f_cost)
+    closed = {start:0} #(point,f_cost)
     best_path_so_far:dict[State,list[State]] = {start:[start]}
     considered_states = 0
 
     while s_open:
-      print(f"s_open vaut {s_open}")
+      # print(f"s_open vaut {s_open}")
       node:State = min([[path_cost(game_map,best_path_so_far[s]) + manhattan_distance(s,goal),s] for s in s_open ])[1]
       # Prend l'état dont le f(n) est le plus petit
 
-      if node == goal: return (best_path_so_far[node][:-1],considered_states)
+      if node == goal: return (best_path_so_far[node],considered_states)
       s_open.remove(node)
       if node not in closed:
         closed[node]=inf
       for s in successors(game_map,node):
+        if s not in closed:
+          closed[s]=inf
+        # print("On reste dans les successeurs")
         considered_states+=1
-        best_path_with_s = best_path_so_far[node]
+        best_path_with_s = best_path_so_far[node].copy()
         best_path_with_s.append(s)
+        # print(f"Le chemin de node est {best_path_so_far[node]} alors que node est {node}")
+        # print(f"On essaie {best_path_with_s}")
         g_n = path_cost(game_map,best_path_with_s)
         h_n = manhattan_distance(s,goal)
         f_n = g_n + h_n
-        if s not in closed or f_n <closed[s]:
-          print(f"À partir de {node} qui vaut {closed[node]}, on trouve {f_n}")
+        if f_n <closed[s]:
+          # print(f"À partir de {node} qui vaut {closed[node]}, on trouve {f_n}")
           closed[s]=f_n
           best_path_so_far[s]=best_path_with_s
+          # print(f"On change pour {best_path_with_s}")
           s_open.add(s)
     return (best_path_so_far[goal],considered_states)
