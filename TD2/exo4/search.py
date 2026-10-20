@@ -140,7 +140,7 @@ def dijkstra(
 
     n = len(game_map)
     m = len(game_map[0])
-    available_states:list(State) = [(i,j) for i in range(n) for j in range(m)]
+    available_states:list[State] = [(i,j) for i in range(n) for j in range(m)]
     for s in available_states:
       if s != start:
         prev[s]=None
@@ -170,6 +170,7 @@ def a_star(
     goal: State,
 ) -> tuple[list[State], int]:
     """Return a minimum-cost path using A* search.
+    From pseudocode in Reinforcement Learning session 2 pdf
 
     The Manhattan distance is used as the heuristic.
 
@@ -180,4 +181,30 @@ def a_star(
     considered_states : int
         Number of states removed from the priority queue.
     """
-    ...
+    s_open = {start} #States
+    closed = {} #(point,f_cost)
+    best_path_so_far:dict[State,list[State]] = {start:[start]}
+    considered_states = 0
+
+    while s_open:
+      print(f"s_open vaut {s_open}")
+      node:State = min([[path_cost(game_map,best_path_so_far[s]) + manhattan_distance(s,goal),s] for s in s_open ])[1]
+      # Prend l'état dont le f(n) est le plus petit
+
+      if node == goal: return (best_path_so_far[node][:-1],considered_states)
+      s_open.remove(node)
+      if node not in closed:
+        closed[node]=inf
+      for s in successors(game_map,node):
+        considered_states+=1
+        best_path_with_s = best_path_so_far[node]
+        best_path_with_s.append(s)
+        g_n = path_cost(game_map,best_path_with_s)
+        h_n = manhattan_distance(s,goal)
+        f_n = g_n + h_n
+        if s not in closed or f_n <closed[s]:
+          print(f"À partir de {node} qui vaut {closed[node]}, on trouve {f_n}")
+          closed[s]=f_n
+          best_path_so_far[s]=best_path_with_s
+          s_open.add(s)
+    return (best_path_so_far[goal],considered_states)
