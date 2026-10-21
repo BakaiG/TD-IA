@@ -8,10 +8,18 @@ import math
 import random
 import time
 from dataclasses import dataclass, field
+from math import inf
 
 from game import (
-    AI, HUMAN, WIN_SCORE, check_winner, evaluate_board,
-    get_valid_moves, get_winner, is_terminal, make_move,
+    AI,
+    HUMAN,
+    WIN_SCORE,
+    check_winner,
+    evaluate_board,
+    get_valid_moves,
+    get_winner,
+    is_terminal,
+    make_move,
 )
 
 MAX_VIS_NODES = 350
@@ -94,19 +102,19 @@ def minimax(board, depth=4):
             return score, None
 
         # TODO 1 (Minimax): Determine whether this is a MAX or MIN node.
-        maximizing = ...
+        maximizing = player==1
 
         # TODO 2: Initialize the best score and best move.
-        best_score = ...
+        best_score = - math.inf if maximizing else math.inf
         best_move = None
 
         for column in get_valid_moves(state):
             # TODO 3: Apply the move and recursively evaluate the child.
-            child = ...
-            value, _ = ...
+            child = make_move(board,column,player)
+            value, _ = search(board,remaining-1,player)
 
             # TODO 4: Keep the best value and corresponding move.
-            if ...:
+            if (maximizing and value>best_score) or (not maximizing and value<best_score):
                 best_score, best_move = value, column
 
         trace.update(node_id, score=best_score)
@@ -147,15 +155,15 @@ def alphabeta(board, depth=6):
                 best_score, best_move = value, column
             # TODO 5 (Alpha-Beta): Update the appropriate bound.
             if maximizing:
-                alpha = ...
+                alpha = max(alpha,value)
             else:
-                beta = ...
+                beta = min(beta,value)
             trace.update(node_id, score=best_score,
                          alpha=alpha if math.isfinite(alpha) else None,
                          beta=beta if math.isfinite(beta) else None)
 
             # TODO 6: Apply the pruning condition.
-            if ...:
+            if alpha>=beta:
                 skipped = moves[index + 1:]
                 if skipped:
                     trace.event("prune", node_id, skipped_moves=skipped,
@@ -211,6 +219,7 @@ def mcts(board, num_simulations=1000, exploration=math.sqrt(2), seed=None):
 
     for iteration in range(num_simulations):
         node = root
+        player = AI
         # 1. Selection: traverse fully expanded, nonterminal nodes.
         while not node.untried_moves and node.children and not is_terminal(node.board):
             log_parent = math.log(node.visits)
@@ -220,9 +229,10 @@ def mcts(board, num_simulations=1000, exploration=math.sqrt(2), seed=None):
             # who moved into that child.
             node = max(
                 node.children,
-                key=lambda child: ...,
+                key=lambda child: child.mean_for(player) + exploration * math.sqrt(math.log(child.parent.visits)/child.visits),
             )
             trace.event("select", node.trace_id, iteration=iteration)
+            player = _other(player) # pas sûr
 
         # 2. Expansion: add exactly one untried child.
         if node.untried_moves and not is_terminal(node.board):

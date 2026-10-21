@@ -3,7 +3,6 @@ import os
 import random
 
 from flask import Flask, jsonify, render_template, request, session
-
 from game import (
     AI,
     HUMAN,
@@ -27,7 +26,7 @@ app.config.update(
 # algorithms = import_module(
 #     "algorithms_sol" if ALGORITHM_MODULE == "solution" else "algorithms"
 # )
-import algorithms_sol as algorithms
+import algorithms
 
 
 def game_state():
