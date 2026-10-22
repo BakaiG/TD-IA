@@ -1,4 +1,5 @@
 import algorithms
+import matplotlib.pyplot as plt
 from game import (
   AI,
   HUMAN,
@@ -21,13 +22,20 @@ def benchmark(board,algo,**kwargs):
 
 
 def benchmark_full():
-  dic_minmax_alphabeta = {
-    "Minimax":{},
-    "alphabeta":{}
-  }
+  tableau=[]
   for prof in [1,2,3,4,5]:
-    dic_minmax_alphabeta["minmax"][f"{prof}"]=benchmark(create_board(),algorithms.minimax,depth=prof)
-    dic_minmax_alphabeta["alphabeta"][f"{prof}"]=benchmark(create_board(),algorithms.alphabeta,depth=prof)
-  dic_MCTS={}
+    b=benchmark(create_board(),algorithms.minimax,depth=prof)
+    tableau.append(["Minimax",f"Depth {prof}",b['move'],b['nodes_explored'],b['time']])
+  for prof in [1,2,3,4,5]:
+    b=benchmark(create_board(),algorithms.alphabeta,depth=prof)
+    tableau.append(["Alpha-Beta",f"Depth {prof}",b['move'],b['nodes_explored'],b['time']])
   for N in (100,500,1000,2000):
-    dic_MCTS[N]=benchmark(create_board(),algorithms.mcts,seed=3)
+    b=benchmark(create_board(),algorithms.mcts,seed=3)
+    tableau.append(["Alpha-Beta",f"{N} simulations",b['move'],b['nodes_explored'],b['time']])
+
+  return tableau
+
+print(benchmark_full())
+
+fig = plt.figure(figsize=(2, 1))
+fig.add_subplot(1,2,1)
