@@ -15,6 +15,7 @@ from game import (
     HUMAN,
     WIN_SCORE,
     check_winner,
+    create_board,
     evaluate_board,
     get_valid_moves,
     get_winner,
@@ -98,11 +99,13 @@ def minimax(board, depth=4):
         node_id = trace.node(parent, move, player, level)
         if remaining == 0 or is_terminal(state):
             score = evaluate_board(state, AI)
+            # print(f"Evaluate_board(empty) : {evaluate_board(create_board(),player)}")
             trace.update(node_id, score=score)
+            # print(f"score de {node_id} : {score}")
             return score, None
 
         # TODO 1 (Minimax): Determine whether this is a MAX or MIN node.
-        maximizing = player==1
+        maximizing = player==2
 
         # TODO 2: Initialize the best score and best move.
         best_score = - math.inf if maximizing else math.inf
@@ -110,8 +113,8 @@ def minimax(board, depth=4):
 
         for column in get_valid_moves(state):
             # TODO 3: Apply the move and recursively evaluate the child.
-            child = make_move(board,column,player)
-            value, _ = search(board,remaining-1,player)
+            child = make_move(state,column,player)
+            value, _ = search(child,remaining-1,_other(player),node_id,column,level+1)
 
             # TODO 4: Keep the best value and corresponding move.
             if (maximizing and value>best_score) or (not maximizing and value<best_score):
@@ -263,10 +266,15 @@ def mcts(board, num_simulations=1000, exploration=math.sqrt(2), seed=None):
             # TODO 8: Increment the visit count and accumulate reward.
             # A win earns 1, a draw 0.5, and a loss 0.
             # Evaluate from the perspective of the player who entered this node.
-            node.visits += ...
+            node.visits += 1
             previous_player = _other(node.player_to_move)
-            reward = ...
-            node.total_reward += ...
+            if winner==previous_player:
+              reward=1
+            elif winner==None:
+              reward = 0.5
+            else:
+              reward = 0
+            node.total_reward += reward
             trace.update(node.trace_id, visits=node.visits,
                          mean_reward=round(node.total_reward / node.visits, 4))
             node = node.parent
