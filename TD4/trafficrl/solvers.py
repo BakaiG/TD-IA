@@ -84,15 +84,18 @@ def value_iteration(
         # every state, using the *previous* values dictionary.
         # Store the resulting dictionary in `updated`.
         # boucle sur transitions pour avoir les outcomes
-
+        # donc c'est les values qu'on update
         updated={s:max(_q(outcomes,values,gamma) for outcomes in actions.values())
                                                  for s,actions in transitions.items()}
 
         # TODO 3b: Compute the maximum absolute change in state values.
+        # pk absolute alors que V_1(s) il prend le max sans valeur absolue, rien à voir ?
         # Store this scalar in `delta`.
+        delta = max(abs(value) for _,value in updated.items())
         # définir la valeur de threshold max entre l'ancienne et la nouvelle value function
 
         # TODO 3c: Extract a greedy policy from the updated values.
+        new_policy = {state : _greedy(transitions[state], updated, gamma) for state in mdp.states}
         # Store the state-to-action mapping in `new_policy`.
         changes = sum(new_policy[s] != policy[s] for s in mdp.states)
         values, policy = updated, new_policy
@@ -145,14 +148,15 @@ def policy_iteration(
             # TODO 4a: Evaluate the current policy with a synchronous
             # Bellman expectation update for every state.
             # Compute `updated` and the maximum value change `delta`.
-            raise NotImplementedError("TODO 4a: implement policy evaluation")
+            updated = {state:_q(transitions[state][policy[state]],values,gamma) for state in mdp.states}
+            delta = max(abs(updated[state] - values[state]) for state in mdp.states)
             values = updated
             if delta < evaluation_epsilon:
                 evaluation_converged = True
                 break
         # TODO 4b: Improve the policy greedily with respect to `values`.
+        improved = {state: _greedy(transitions[state],values,gamma) for state in mdp.states}
         # Store the new state-to-action mapping in `improved`.
-        raise NotImplementedError("TODO 4b: implement policy improvement")
         changes = sum(improved[s] != policy[s] for s in mdp.states)
         policy = improved
         record = {
